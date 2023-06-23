@@ -1,10 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common'
 import { User, Bookmark } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { AuthDto } from './dto'
+import { AuthDto, AuthinDto } from './dto'
 import * as argon from 'argon2'
 import { stringify } from 'querystring'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
+import { request } from 'http'
 
 @Injectable()
 
@@ -40,7 +41,20 @@ export class AuthService {
 
         }
     }
-    signin() {
-        return 'SIGNINHERE'
+    async signin(dto: AuthinDto) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email: dto.email,
+            }
+        })
+        if(!user) return ({ msg: "the user does not exist" })
+
+        const passwordmatch = await argon.verify(user.password, dto.password)
+        if(!passwordmatch) return ({ msg: "Incorrect password..." })
+
+        delete user.password;
+        return user;
+
+        // return 'SIGNINHERE'
     }
 }
