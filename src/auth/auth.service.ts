@@ -8,6 +8,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 import { request } from 'http'
 import { JwtService } from '@nestjs/jwt/dist'
 import { ConfigService } from '@nestjs/config/dist/config.service'
+import { Tokens } from './types'
 
 @Injectable()
 
@@ -17,7 +18,7 @@ export class AuthService {
         private jwt: JwtService,
         private config: ConfigService,
     ) { }
-
+ 
     async signup(dto: AuthDto) {
         const hash = await argon.hash(dto.password)
 
@@ -62,23 +63,51 @@ export class AuthService {
         // delete user.password;
         return this.signToken(user.id, user.email);
     }
+
+    signout(){}
+
+
+    async refreshTokens(userId: number, rt: string){
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: userId,
+            }
+        })
+        if(!user) return ({ msg: "Access Denied" })
+
+        const tokens = await this.signToken(user.id, user.email)
+
+        const rtMatches = await argon.verify(rt, tokens.refresh_token)
+        if(!rtMatches) return ({msg: "Access denied two"})
+
+        return tokens
+    }
+
+
     async signToken(
         userId: number,
         email: string,
-    ): Promise<{ access_token: string}> {
+    ): Promise<Tokens> {
         const payload = {
             sub: userId,
             email,
         };
         const secret = this.config.get('JWT_SECRET')
+        const secret2 = this.config.get('JWT_SECRETRT')
 
-        const token = await this.jwt.signAsync(payload, {
+        const accesstoken = await this.jwt.signAsync(payload, {
             expiresIn: '30m',
             secret: secret,
         },);
 
+        const refreshtoken = await this.jwt.signAsync(payload, {
+            expiresIn: '7d',
+            secret: secret,
+        },);
+
         return {
-            access_token: token,
+            access_token: accesstoken,
+            refresh_token: refreshtoken,
         };
     }
 }

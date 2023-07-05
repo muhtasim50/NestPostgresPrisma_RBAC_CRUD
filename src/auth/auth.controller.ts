@@ -1,7 +1,11 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto, AuthinDto } from './dto';
 import { CustomBody } from 'src/decorators/CustomBody.decorator';
+import { Tokens } from './types';
+import { AuthGuard } from '@nestjs/passport';
+// import { Request} from 'express'
+import { JwtrtGuard } from './guard/jwtrt.guard';
 
 
 @Controller('auth')
@@ -18,5 +22,18 @@ export class AuthController{
     @Post('signin')
     signin(@CustomBody() dto: AuthinDto) {
         return this.authService.signin(dto)
+    }
+
+    // @Post('signout')
+    // signout(){}
+
+    @UseGuards(AuthGuard('jwt-refresh'))
+    // @HttpCode(HttpStatus.OK)
+    @Post('refresh')
+    refreshTokens(@Request() req){
+        console.log("aba")
+        const users = req.user;
+        console.log("aaa")
+        return this.authService.refreshTokens(users['sub'], users['refreshToken'])
     }
 }
