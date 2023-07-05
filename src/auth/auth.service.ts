@@ -77,10 +77,10 @@ export class AuthService {
 
         const tokens = await this.signToken(user.id, user.email)
 
-        const rtMatches = await argon.verify(rt, tokens.refresh_token)
-        if(!rtMatches) return ({msg: "Access denied two"})
+        // const rtMatches = (tokens.refresh_token === rt)
+        // if(!rtMatches) return ({msg: "Access denied two"})
 
-        return tokens
+        return ({tokens, user});
     }
 
 
@@ -102,7 +102,7 @@ export class AuthService {
 
         const refreshtoken = await this.jwt.signAsync(payload, {
             expiresIn: '7d',
-            secret: secret,
+            secret: secret2,
         },);
 
         return {

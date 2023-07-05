@@ -16,17 +16,27 @@ export class RtStrategy extends PassportStrategy(
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: config.get('JWT_SECRETRT'),
-            // passReqToCallback: true,
+            passReqToCallback: true,
         })
     }
 
     async validate(req: Request, payload:
         {
-        sub: number,
-        email: string
+        sub: number;
+        email: string;
     }
     ) {
-        // // console.log({
+        const refreshToken = req?.get('authorization')?.replace('Bearer', '').trim();
+        console.log(payload, 'payload!')
+        return {
+            ...payload,
+            refreshToken,
+        }
+    }
+}
+
+
+// // console.log({
         // //     payload,
         // // })
         // const user = await this.prisma.user.findUnique({
@@ -35,10 +45,3 @@ export class RtStrategy extends PassportStrategy(
         //     }
         // })
         // delete user.password;
-        const refreshToken = req.get('Authorization').replace('Bearer', '').trim();
-        return {
-            ...payload,
-            refreshToken,
-        }
-    }
-}
