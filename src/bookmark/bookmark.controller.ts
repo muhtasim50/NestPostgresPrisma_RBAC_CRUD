@@ -9,6 +9,13 @@ import { CreateBookmarkDto, EditBookmarkDto } from './dto';
 export class BookmarkController {
     constructor(private bookmarkService: BookmarkService){}
 
+    @Get('allbookmarks')
+    getallBookmarks(@GetUser('id') userId: number){
+        return this.bookmarkService.getallBookmarks(
+            userId,
+        )
+    }
+
     @Get()
     getBookmarks(@GetUser('id') userId: number){
         return this.bookmarkService.getBookmarks(

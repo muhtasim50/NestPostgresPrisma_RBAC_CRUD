@@ -5,7 +5,25 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class BookmarkService {
     constructor(private prisma: PrismaService){}
-  
+
+    async getallBookmarks(userId: number){
+        const userss = await this.prisma.user.findUnique({
+            where: {
+                id: userId,
+            }
+        })
+
+        if(userss.role === 1) return this.prisma.bookmark.findMany({  
+        })
+
+        return this.prisma.bookmark.findMany({
+            where: {
+                userId,
+            }
+        })
+
+    }
+    
     getBookmarks(userId: number){
         return this.prisma.bookmark.findMany({
             where: {
@@ -13,15 +31,18 @@ export class BookmarkService {
             }
         })
     }
-
  
-    getBookmarkById(userId: number, bookmarkId: number){
-        return this.prisma.bookmark.findFirst({
+    async getBookmarkById(userId: number, bookmarkId: number){
+        const bookmarkss = await this.prisma.bookmark.findFirst({
             where: {
                 id: bookmarkId,
                 userId,
             }
         })
+
+        if(!bookmarkss) return ({msg: "Invalid Bookmark ID"});
+        return bookmarkss;
+
     }
 
 
