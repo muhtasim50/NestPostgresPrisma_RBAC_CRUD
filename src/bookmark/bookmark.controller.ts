@@ -4,11 +4,12 @@ import { BookmarkService } from './bookmark.service';
 import { GetUser } from 'src/auth/decorator';
 import { CreateBookmarkDto, EditBookmarkDto } from './dto';
 
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @Controller('bookmarks')
 export class BookmarkController {
     constructor(private bookmarkService: BookmarkService) { }
 
+    @UseGuards(JwtGuard)
     @Get('allbookmarks')
     getallBookmarks(@GetUser('id') userId: number) {
         return this.bookmarkService.getallBookmarks(
@@ -16,6 +17,7 @@ export class BookmarkController {
         )
     }
 
+    @UseGuards(JwtGuard)
     @Get()
     getBookmarks(@GetUser('id') userId: number) {
         return this.bookmarkService.getBookmarks(
@@ -23,6 +25,7 @@ export class BookmarkController {
         )
     }
 
+    @UseGuards(JwtGuard)
     @Get(':id')
     getBookmarkById(
         @GetUser('id') userId: number,
@@ -34,6 +37,7 @@ export class BookmarkController {
         )
     }
 
+    @UseGuards(JwtGuard)
     @Post('create')
     createBookmark(
         @GetUser('id') userId: number,
@@ -45,6 +49,7 @@ export class BookmarkController {
         )
     }
 
+    
     @Post('createbyadmin')
     createBookmarkadmin(
         @GetUser('id') userId: number,
@@ -56,6 +61,7 @@ export class BookmarkController {
         )
     }
 
+    @UseGuards(JwtGuard)
     @Patch(':id')
     editBookmarkById(
         @GetUser('id') userId: number,
@@ -69,6 +75,7 @@ export class BookmarkController {
         )
     }
 
+    @UseGuards(JwtGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     @Delete(':id')
     deleteBookmarkById(

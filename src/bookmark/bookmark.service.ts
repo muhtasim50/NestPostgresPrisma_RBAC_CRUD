@@ -58,6 +58,12 @@ export class BookmarkService {
     }
 
     async createBookmarkadmin(userId: number, dto: CreateBookmarkDto){
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: userId,
+            }
+        })
+        // if(user.role === 1)
         const bookmark = await this.prisma.bookmark.create({
             data: {
                 userId,
