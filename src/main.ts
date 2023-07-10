@@ -9,6 +9,14 @@ async function bootstrap() {
       whitelist: true,
   }),
   );
+  const cors = require("cors")
+  const corsOptions = {
+    origin: '*',
+    Credential: true,
+    optionSuccessStatus: 200,
+  }
+  app.use(cors(corsOptions))
   await app.listen(3002);
+
 }
 bootstrap();
